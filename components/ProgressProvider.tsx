@@ -52,6 +52,15 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
     const fetchProgress = async () => {
       setLoading(true)
+      
+      const local = localStorage.getItem(`progress_${user.id}`)
+      let localData = null;
+      if (local) {
+        try {
+          localData = JSON.parse(local)
+        } catch(e) {}
+      }
+
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
@@ -59,17 +68,26 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         .single();
       
       if (data && !error) {
-        setProgress({
+        const serverData = {
           completed_days: data.completed_days || [],
           current_day: data.current_day || 1,
           streak: data.streak || 0,
           best_streak: data.best_streak || 0,
           total_minutes: data.total_minutes || 0,
           total_workouts: data.total_workouts || 0,
-        })
-      } else if (error && error.code === 'PGRST116') {
-        // Not found, that's fine, we will use default
-        setProgress(defaultProgress)
+        }
+        if (localData && localData.completed_days?.length > serverData.completed_days?.length) {
+          setProgress(localData);
+        } else {
+          setProgress(serverData)
+          localStorage.setItem(`progress_${user.id}`, JSON.stringify(serverData))
+        }
+      } else {
+        if (localData) {
+          setProgress(localData)
+        } else {
+          setProgress(defaultProgress)
+        }
       }
       setLoading(false)
     }
@@ -100,6 +118,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
     // Optimistic update
     setProgress(newProgress);
+    localStorage.setItem(`progress_${user.id}`, JSON.stringify(newProgress));
 
     // Try to update Supabase
     const { error } = await supabase.from('user_progress').upsert({
@@ -109,8 +128,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     }, { onConflict: 'user_id' });
     
     if (error) {
-      console.error("Erro ao salvar progresso:", error);
-      alert("Erro ao salvar no banco de dados. Verifique o console ou as políticas RLS no Supabase.");
+      console.warn("Aviso: Falha no Supabase. Usando Local Storage como fallback. Erro:", error);
     }
   }
 
