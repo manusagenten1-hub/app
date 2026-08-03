@@ -21,23 +21,23 @@ export function ExerciseModal({ exercise, isOpen, onClose }: ExerciseModalProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-slate-100 p-6 flex flex-col gap-2">
+      <DialogContent className="w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-slate-100 p-4 sm:p-6 flex flex-col gap-2">
           <DialogHeader>
             <div className="flex items-center gap-2 mb-2">
-              <Badge variant="secondary" className="bg-purple-50 text-[#8B5CF6] hover:bg-purple-100">
+              <Badge variant="secondary" className="bg-purple-50 text-[#8B5CF6] hover:bg-purple-100 text-[10px] sm:text-xs">
                 {exercise.categoria || "Categoria"}
               </Badge>
-              <Badge variant="outline" className="text-[#666666] border-gray-200">
+              <Badge variant="outline" className="text-[#666666] border-gray-200 text-[10px] sm:text-xs">
                 {exercise.nivel || "Nível"}
               </Badge>
             </div>
-            <DialogTitle className="text-2xl font-bold text-[#111111]">{exercise.nome || "Nome do Exercício"}</DialogTitle>
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-[#111111]">{exercise.nome || "Nome do Exercício"}</DialogTitle>
           </DialogHeader>
         </div>
 
-        <div className="p-6 space-y-8">
-          <div className="grid grid-cols-3 gap-4">
+        <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
             <div className="flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-50 text-center">
               <Dumbbell className="h-5 w-5 text-[#8B5CF6] mb-2" />
               <span className="text-xs text-[#666666] font-bold uppercase tracking-wider">Séries</span>
