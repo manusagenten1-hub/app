@@ -19,6 +19,9 @@ export default function Home() {
   const percentCompleted = Math.round((progress.completed_days.length / 21) * 100)
   const currentRoutine = ROUTINE_DAYS.find(d => d.dia === currentDayNumber)
   
+  const today = new Date().toLocaleDateString('en-CA');
+  const workedOutToday = progress.last_workout_date === today;
+  
   const nextRoutines = ROUTINE_DAYS.filter(d => d.dia > currentDayNumber).slice(0, 2)
 
   return (
@@ -94,12 +97,19 @@ export default function Home() {
               </div>
             </div>
 
-            <Link href={`/rotina/${currentDayNumber}`} passHref>
-              <Button size="lg" className="w-full sm:w-auto gap-2 text-base sm:text-lg h-12 sm:h-14 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
-                <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6" />
-                Começar Treino
+            {workedOutToday ? (
+              <Button size="lg" disabled className="w-full sm:w-auto gap-2 text-base sm:text-lg h-12 sm:h-14 rounded-xl sm:rounded-2xl shadow-md opacity-80">
+                <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
+                Treino de Hoje Concluído
               </Button>
-            </Link>
+            ) : (
+              <Link href={`/rotina/${currentDayNumber}`} passHref>
+                <Button size="lg" className="w-full sm:w-auto gap-2 text-base sm:text-lg h-12 sm:h-14 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
+                  <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+                  Começar Treino
+                </Button>
+              </Link>
+            )}
           </CardContent>
         </Card>
       </section>
