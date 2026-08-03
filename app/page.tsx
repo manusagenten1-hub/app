@@ -103,12 +103,12 @@ export default function Home() {
                 Treino de Hoje Concluído
               </Button>
             ) : (
-              <Button asChild size="lg" className="w-full sm:w-auto gap-2 text-base sm:text-lg h-12 sm:h-14 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
-                <Link href={`/rotina/${currentDayNumber}`}>
+              <Link href={`/rotina/${currentDayNumber}`} passHref>
+                <Button size="lg" className="w-full sm:w-auto gap-2 text-base sm:text-lg h-12 sm:h-14 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
                   <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6" />
                   Começar Treino
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             )}
           </CardContent>
         </Card>
