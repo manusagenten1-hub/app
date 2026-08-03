@@ -59,7 +59,14 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         .single();
       
       if (data && !error) {
-        setProgress(data as ProgressData)
+        setProgress({
+          completed_days: data.completed_days || [],
+          current_day: data.current_day || 1,
+          streak: data.streak || 0,
+          best_streak: data.best_streak || 0,
+          total_minutes: data.total_minutes || 0,
+          total_workouts: data.total_workouts || 0,
+        })
       } else if (error && error.code === 'PGRST116') {
         // Not found, that's fine, we will use default
         setProgress(defaultProgress)
@@ -103,6 +110,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     
     if (error) {
       console.error("Erro ao salvar progresso:", error);
+      alert("Erro ao salvar no banco de dados. Verifique o console ou as políticas RLS no Supabase.");
     }
   }
 
