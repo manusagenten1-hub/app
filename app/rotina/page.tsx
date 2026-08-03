@@ -1,36 +1,39 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, Lock, Timer } from "lucide-react"
 import Link from "next/link"
 import { ROUTINE_DAYS } from "@/lib/routine"
+import { useProgress } from "@/components/ProgressProvider"
 
 export default function RotinaPage() {
   const days = ROUTINE_DAYS
+  const { progress } = useProgress()
   
-  // Mock progress state
-  const completedDays = 5
-  const currentDay = 6
+  const completedDaysList = progress.completed_days
+  const currentDay = progress.current_day
 
   return (
-    <div className="mx-auto max-w-4xl p-6 sm:p-10 space-y-8 animate-in fade-in duration-500">
-      <header className="space-y-4">
+    <div className="mx-auto max-w-4xl p-4 sm:p-10 space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+      <header className="space-y-3 sm:space-y-4">
         <div>
           <Badge className="bg-purple-50 text-[#8B5CF6] hover:bg-purple-100 mb-2">Programa Completo</Badge>
-          <h1 className="text-3xl font-bold tracking-tight text-[#111111]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111111]">
             Rotina dos <span className="text-[#8B5CF6]">21 Dias</span>
           </h1>
         </div>
-        <p className="text-lg text-[#666666]">
+        <p className="text-base sm:text-lg text-[#666666]">
           Sua jornada para transformar e empinar seus glúteos.
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {days.map((diaTreino) => {
           const dia = diaTreino.dia
-          const isCompleted = dia <= completedDays
+          const isCompleted = completedDaysList.includes(dia)
           const isCurrent = dia === currentDay
-          const isLocked = dia > currentDay
+          const isLocked = dia > currentDay && !isCompleted // Usually you can't lock completed days
 
           return (
             <Link key={dia} href={isLocked ? "#" : `/rotina/${dia}`} passHref>
@@ -47,7 +50,7 @@ export default function RotinaPage() {
                 
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`text-sm font-bold uppercase tracking-wider ${
+                     <span className={`text-sm font-bold uppercase tracking-wider ${
                       isCurrent ? "text-[#8B5CF6]" : "text-[#666666]"
                     }`}>
                       Dia {dia}
@@ -61,7 +64,7 @@ export default function RotinaPage() {
                     )}
                   </div>
                   
-                  <h3 className="font-bold text-[#111111] mb-2">{diaTreino.titulo}</h3>
+                  <h3 className="font-bold text-[#111111] mb-2 line-clamp-1">{diaTreino.titulo}</h3>
                   <div className="flex items-center gap-1.5 text-sm font-bold text-[#666666]">
                     <Timer className="h-4 w-4" />
                     {diaTreino.tempo}
