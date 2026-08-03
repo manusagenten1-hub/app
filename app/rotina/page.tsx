@@ -32,8 +32,17 @@ export default function RotinaPage() {
         {days.map((diaTreino) => {
           const dia = diaTreino.dia
           const isCompleted = completedDaysList.includes(dia)
+          
+          const today = new Date().toLocaleDateString('en-CA');
+          const workedOutToday = progress.last_workout_date === today;
+          
+          // Day is current if it's the `current_day` in progress
           const isCurrent = dia === currentDay
-          const isLocked = dia > currentDay && !isCompleted // Usually you can't lock completed days
+          
+          // Day is locked if:
+          // 1. It's in the future (dia > currentDay)
+          // 2. Or it's the current day, but the user already worked out today
+          const isLocked = !isCompleted && (dia > currentDay || (dia === currentDay && workedOutToday));
 
           return (
             <Link key={dia} href={isLocked ? "#" : `/rotina/${dia}`} passHref>
