@@ -3,38 +3,45 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Flame, Trophy, Timer, Calendar as CalendarIcon, CheckCircle2 } from "lucide-react"
+import { useProgress } from "@/components/ProgressProvider"
 
 export default function ProgressoPage() {
+  const { progress } = useProgress()
+  const diasConcluidos = progress.completed_days.length
+  
   const data = {
-    diasConcluidos: 5,
-    diasRestantes: 16,
-    sequenciaAtual: 5,
-    maiorSequencia: 5,
-    minutosTreinados: 110,
-    treinosConcluidos: 5,
-    percentualGeral: 24,
+    diasConcluidos: diasConcluidos,
+    diasRestantes: 21 - diasConcluidos,
+    sequenciaAtual: progress.streak,
+    maiorSequencia: progress.best_streak,
+    minutosTreinados: progress.total_minutes,
+    treinosConcluidos: progress.total_workouts,
+    percentualGeral: Math.round((diasConcluidos / 21) * 100),
   }
 
-  // Generate calendar mock
-  const calendarDays = Array.from({ length: 30 }, (_, i) => ({
-    date: i + 1,
-    isCompleted: i < 5,
-    isToday: i === 5,
-  }))
+  // Generate calendar (21 days)
+  const calendarDays = Array.from({ length: 21 }, (_, i) => {
+    const dayNum = i + 1;
+    return {
+      date: dayNum,
+      isCompleted: progress.completed_days.includes(dayNum),
+      isToday: progress.current_day === dayNum,
+    }
+  })
 
   return (
-    <div className="mx-auto max-w-4xl p-6 sm:p-10 space-y-8 animate-in fade-in duration-500">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+    <div className="mx-auto max-w-4xl p-4 sm:p-10 space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+      <header className="space-y-1 sm:space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
           Seu <span className="text-violet-500">Progresso</span>
         </h1>
-        <p className="text-slate-500">
+        <p className="text-sm sm:text-base text-slate-500">
           Acompanhe sua evolução e celebre cada conquista.
         </p>
       </header>
 
       {/* Main Stats Grid */}
-      <div className="grid gap-4 grid-cols-2">
+      <div className="grid gap-2 sm:gap-4 grid-cols-2">
         <div className="bg-gray-50 rounded-2xl p-4">
           <span className="block text-[#666666] text-[10px] font-bold uppercase tracking-wide mb-1">Sequência Atual</span>
           <p className="text-xl font-bold text-[#111111]">{data.sequenciaAtual} dias</p>
@@ -79,17 +86,11 @@ export default function ProgressoPage() {
       <section>
         <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
           <CalendarIcon className="h-5 w-5 text-slate-400" />
-          Histórico
+          Dias do Programa
         </h2>
         <Card className="bg-white">
           <CardContent className="p-6">
             <div className="grid grid-cols-7 gap-2 sm:gap-4 text-center">
-              {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((day, index) => (
-                <div key={`${day}-${index}`} className="text-xs font-semibold text-slate-400 mb-2">{day}</div>
-              ))}
-              {/* Empty slots for month start (mock) */}
-              <div /><div /><div />
-              
               {calendarDays.map((day, i) => (
                 <div 
                   key={i}
