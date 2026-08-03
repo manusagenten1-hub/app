@@ -2,12 +2,15 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Bell, Moon, User, Shield, CircleHelp, LogOut } from "lucide-react"
+import { User, CircleHelp, LogOut } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/AuthProvider"
+import Link from "next/link"
 
 export default function ConfiguracoesPage() {
   const router = useRouter()
+  const { user } = useAuth()
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -18,32 +21,24 @@ export default function ConfiguracoesPage() {
     {
       title: "Conta",
       items: [
-        { icon: User, label: "Perfil", value: "aluna@exemplo.com" },
-        { icon: Shield, label: "Privacidade e Segurança", value: "" },
-      ]
-    },
-    {
-      title: "Preferências",
-      items: [
-        { icon: Bell, label: "Notificações", value: "Ativado" },
-        { icon: Moon, label: "Tema Escuro", value: "Desativado" },
+        { icon: User, label: "Perfil", value: user?.email || "" },
       ]
     },
     {
       title: "Suporte",
       items: [
-        { icon: CircleHelp, label: "Central de Ajuda", value: "" },
+        { icon: CircleHelp, label: "Central de Ajuda", value: "", href: "https://wa.me/5551981794338" },
       ]
     }
   ]
 
   return (
-    <div className="mx-auto max-w-2xl p-6 sm:p-10 space-y-8 animate-in fade-in duration-500">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-[#111111]">
+    <div className="mx-auto max-w-2xl p-4 sm:p-10 space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-24">
+      <header className="space-y-1 sm:space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111111]">
           Configurações
         </h1>
-        <p className="text-[#666666]">
+        <p className="text-sm sm:text-base text-[#666666]">
           Ajuste suas preferências e dados da conta.
         </p>
       </header>
@@ -58,7 +53,8 @@ export default function ConfiguracoesPage() {
               <div className="flex flex-col divide-y divide-gray-100">
                 {section.items.map((item, itemIdx) => {
                   const Icon = item.icon
-                  return (
+                  
+                  const content = (
                     <div 
                       key={itemIdx} 
                       className="flex items-center justify-between p-5 hover:bg-gray-50 cursor-pointer transition-colors"
@@ -74,6 +70,16 @@ export default function ConfiguracoesPage() {
                       )}
                     </div>
                   )
+
+                  if ('href' in item) {
+                    return (
+                      <a key={itemIdx} href={(item as any).href} target="_blank" rel="noopener noreferrer">
+                        {content}
+                      </a>
+                    )
+                  }
+
+                  return content
                 })}
               </div>
             </Card>
