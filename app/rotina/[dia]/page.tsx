@@ -1,17 +1,27 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Timer, PlayCircle, CheckCircle2, ChevronLeft, Dumbbell, Activity, Clock } from "lucide-react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { ROUTINE_DAYS } from "@/lib/routine"
+import { useProgress } from "@/components/ProgressProvider"
+import { ExerciseModal } from "@/components/ExerciseModal"
+import { Exercise } from "@/types"
 
 export default function DiaTreinoPage() {
   const params = useParams()
+  const router = useRouter()
   const diaNumber = parseInt(params.dia as string, 10)
+  const { markCompleted, progress } = useProgress()
   
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
+  const [isStarted, setIsStarted] = useState(false)
+  const [isCompleting, setIsCompleting] = useState(false)
+
   const diaTreino = ROUTINE_DAYS.find(d => d.dia === diaNumber)
   
   if (!diaTreino) {
@@ -19,21 +29,30 @@ export default function DiaTreinoPage() {
   }
 
   const exercicios = diaTreino.exercicios
+  const isAlreadyCompleted = progress.completed_days.includes(diaNumber)
+
+  const handleComplete = async () => {
+    setIsCompleting(true)
+    const minutes = parseInt(diaTreino.tempo.split(" ")[0]) || 25
+    await markCompleted(diaNumber, minutes)
+    setIsCompleting(false)
+    router.push("/rotina")
+  }
 
   return (
-    <div className="mx-auto max-w-3xl p-6 sm:p-10 space-y-8 animate-in fade-in duration-500 pb-24">
+    <div className="mx-auto max-w-3xl p-4 sm:p-10 space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-32">
       {/* Back button */}
       <Link href="/rotina" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
         <ChevronLeft className="h-4 w-4 mr-1" />
         Voltar para rotina
       </Link>
 
-      <header className="space-y-4 text-center sm:text-left">
+      <header className="space-y-3 sm:space-y-4 text-center sm:text-left">
         <Badge className="bg-purple-50 text-[#8B5CF6] hover:bg-purple-100">Dia {diaTreino.dia}</Badge>
-        <h1 className="text-3xl font-bold tracking-tight text-[#111111] sm:text-4xl">
+        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#111111]">
           {diaTreino.titulo}
         </h1>
-        <p className="text-lg text-[#666666]">
+        <p className="text-base sm:text-lg text-[#666666]">
           {diaTreino.foco}
         </p>
 
@@ -62,7 +81,11 @@ export default function DiaTreinoPage() {
         <h2 className="text-xl font-bold text-[#111111] mb-6">Exercícios</h2>
         <div className="space-y-3">
           {exercicios.map((ex, index) => (
-             <Card key={ex.id} className="group cursor-pointer hover:border-purple-200 transition-colors border-gray-100">
+             <Card 
+               key={ex.id} 
+               className="group cursor-pointer hover:border-purple-200 transition-colors border-gray-100"
+               onClick={() => setSelectedExercise(ex as Exercise)}
+             >
                <CardContent className="p-4 sm:p-5 flex items-center">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-50 text-[#666666] font-bold mr-4 text-sm">
                     {index + 1}
@@ -91,15 +114,34 @@ export default function DiaTreinoPage() {
 
       {/* Action Buttons */}
       <div className="fixed bottom-[80px] sm:bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t border-slate-100 flex flex-col sm:flex-row justify-center gap-4 z-40 sm:static sm:bg-transparent sm:border-none sm:p-0">
-        <Button size="lg" className="w-full sm:w-auto h-14 rounded-2xl shadow-lg gap-2 text-sm font-bold tracking-wide">
+        <Button 
+          onClick={() => {
+            setIsStarted(true)
+            window.scrollTo({ top: document.body.scrollHeight / 2, behavior: 'smooth' })
+          }}
+          size="lg" 
+          className="w-full sm:w-auto h-14 rounded-2xl shadow-lg gap-2 text-sm font-bold tracking-wide"
+        >
           <PlayCircle className="h-6 w-6" />
-          Começar Treino
+          {isStarted ? "Treino em Andamento..." : "Começar Treino"}
         </Button>
-        <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 rounded-2xl gap-2 bg-white">
-          <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-          Marcar como concluído
+        <Button 
+          onClick={handleComplete}
+          disabled={isCompleting || isAlreadyCompleted}
+          variant="outline" 
+          size="lg" 
+          className="w-full sm:w-auto h-14 rounded-2xl gap-2 bg-white"
+        >
+          <CheckCircle2 className={`h-6 w-6 ${isAlreadyCompleted ? "text-gray-400" : "text-emerald-500"}`} />
+          {isCompleting ? "Marcando..." : (isAlreadyCompleted ? "Concluído" : "Marcar como concluído")}
         </Button>
       </div>
+
+      <ExerciseModal
+        exercise={selectedExercise}
+        isOpen={!!selectedExercise}
+        onClose={() => setSelectedExercise(null)}
+      />
     </div>
   )
 }
