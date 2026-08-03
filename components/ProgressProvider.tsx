@@ -11,6 +11,7 @@ type ProgressData = {
   best_streak: number;
   total_minutes: number;
   total_workouts: number;
+  last_workout_date?: string | null;
 }
 
 const defaultProgress: ProgressData = {
@@ -19,7 +20,8 @@ const defaultProgress: ProgressData = {
   streak: 0,
   best_streak: 0,
   total_minutes: 0,
-  total_workouts: 0
+  total_workouts: 0,
+  last_workout_date: null
 }
 
 type ProgressContextType = {
@@ -75,6 +77,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
           best_streak: data.best_streak || 0,
           total_minutes: data.total_minutes || 0,
           total_workouts: data.total_workouts || 0,
+          last_workout_date: data.last_workout_date || null,
         }
         if (localData && localData.completed_days?.length > serverData.completed_days?.length) {
           setProgress(localData);
@@ -107,6 +110,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     const newBestStreak = Math.max(progress.best_streak, newStreak);
     const newCurrentDay = Math.max(progress.current_day, Math.min(day + 1, 21));
 
+    const today = new Date().toLocaleDateString('en-CA');
     const newProgress = {
       completed_days: newCompletedDays,
       current_day: newCurrentDay,
@@ -114,6 +118,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       best_streak: newBestStreak,
       total_minutes: newTotalMinutes,
       total_workouts: newTotalWorkouts,
+      last_workout_date: today
     };
 
     // Optimistic update
@@ -124,7 +129,6 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.from('user_progress').upsert({
       user_id: user.id,
       ...newProgress,
-      last_workout_date: new Date().toISOString().split('T')[0]
     }, { onConflict: 'user_id' });
     
     if (error) {
