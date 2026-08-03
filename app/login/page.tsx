@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
 export default function LoginPage() {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -25,6 +26,11 @@ export default function LoginPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              name: name,
+            }
+          }
         })
         if (error) throw error
         alert("Conta criada! Você já pode fazer login.")
@@ -58,6 +64,19 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent className="px-0 pb-0">
           <form onSubmit={handleAuth} className="space-y-4">
+            {isSignUp && (
+              <div>
+                <label className="block text-sm font-medium text-[#111111] mb-1">Nome Completo</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] transition-all"
+                  placeholder="Seu nome"
+                />
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-[#111111] mb-1">E-mail</label>
               <input
