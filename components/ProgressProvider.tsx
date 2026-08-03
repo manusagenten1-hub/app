@@ -45,9 +45,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setProgress(defaultProgress)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false)
       return
     }
