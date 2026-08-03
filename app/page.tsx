@@ -9,12 +9,10 @@ import Link from "next/link"
 import { useAuth } from "@/components/AuthProvider"
 import { useProgress } from "@/components/ProgressProvider"
 import { ROUTINE_DAYS } from "@/lib/routine"
-import { useRouter } from "next/navigation"
 
 export default function Home() {
   const { user } = useAuth()
   const { progress } = useProgress()
-  const router = useRouter()
 
   const userName = user?.user_metadata?.name || "Aluna"
   const currentDayNumber = progress.current_day > 21 ? 21 : progress.current_day
@@ -105,13 +103,11 @@ export default function Home() {
                 Treino de Hoje Concluído
               </Button>
             ) : (
-              <Button 
-                onClick={() => router.push(`/rotina/${currentDayNumber}`)}
-                size="lg" 
-                className="w-full sm:w-auto gap-2 text-base sm:text-lg h-12 sm:h-14 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
-              >
-                <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6" />
-                Começar Treino
+              <Button asChild size="lg" className="w-full sm:w-auto gap-2 text-base sm:text-lg h-12 sm:h-14 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
+                <Link href={`/rotina/${currentDayNumber}`}>
+                  <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+                  Começar Treino
+                </Link>
               </Button>
             )}
           </CardContent>
